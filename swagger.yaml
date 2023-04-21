@@ -156,13 +156,13 @@ paths:
           multipart/form-data:
             encoding: {}
             schema:
-              required:
-              - image
               type: object
               properties:
                 image:
                   type: string
                   format: binary
+                text:
+                  type: string
         required: false
       responses:
         '200':
