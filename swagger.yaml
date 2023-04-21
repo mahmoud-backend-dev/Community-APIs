@@ -180,7 +180,6 @@ paths:
       - name: limit
         in: query
         description: ''
-        required: true
         style: form
         explode: true
         schema:
@@ -190,7 +189,6 @@ paths:
       - name: page
         in: query
         description: ''
-        required: true
         style: form
         explode: true
         schema:
@@ -223,9 +221,6 @@ paths:
           multipart/form-data:
             encoding: {}
             schema:
-              required:
-              - image
-              - text
               type: object
               properties:
                 image:
