@@ -18,7 +18,10 @@ exports.addCommentToPost = asyncHandler(async (req, res) => {
 // @route GET /api/v1/posts/:id/comments
 // @ptotect Protected/User/Manager/Admin
 exports.getAllComment = asyncHandler(async (req, res) => {
-  const allComment = await Comment.find({ post: req.params.id });
+  const allComment = await Comment.find({ post: req.params.id }).populate({
+    path: "user",
+    select:'name'
+  });
   if (allComment.length === 0)
     return res.status(StatusCodes.NO_CONTENT).send();
   res.status(StatusCodes.OK).json({ status: "Success", count: allComment.length, allComment });
