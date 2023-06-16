@@ -5,6 +5,8 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 1812;
+const httpServer = require('http').createServer(app);
+const io = require('socket.io')(httpServer);
 // Setting Security For App
 const cors = require('cors');
 const compression = require('compression');
@@ -21,6 +23,7 @@ const errorHandler = require('./middleware/error-handler');
 const notFoundErr = require('./middleware/notFoundMiddleware');
 const connectDB = require('./db/connectDB');
 const mountRoutes = require('./routes');
+
 
 // Enable other domains to access your application
 app.use(cors());
@@ -60,17 +63,20 @@ app.use(limiter)
 app.use(hpp());
 
 
+
+
 // Mount Api
 mountRoutes(app);
 
 app.use(errorHandler);
 app.use(notFoundErr);
 
+app.set('SocketIO',io)
 
 const start = async () => {
     try {
         await connectDB(process.env.URI);
-        app.listen(port, () => console.log(`Listen server on http://localhost:${port}`));
+        httpServer.listen(port, () => console.log(`Listen server on http://localhost:${port}`));
     } catch (error) {
         console.log(error);
     }

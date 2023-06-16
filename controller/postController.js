@@ -129,6 +129,18 @@ exports.getAllLikes = asyncHandler(async (req, res) => {
 // @route POST /api/v1/posts/:id/likes
 // @ptotect Protected/User
 exports.addLike = asyncHandler(async (req, res) => {
+  const io = req.app.get('SocketIO');
+  io.on('connection', (client) => {
+    client.on('forAllLikes', (postId) => {
+      if (postId === req.params.id) {
+        const allLikes = await Post.findById(req.params.id);
+        const numOfLikes = allLikes.likes.length + 1;
+        io.emit('NumberOfLikes', numOfLikes);
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
+      }
+    })
+  })
   const likes = await Post.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -142,6 +154,18 @@ exports.addLike = asyncHandler(async (req, res) => {
 // @route DELETE /api/v1/posts/:id/likes
 // @ptotect Protected/User
 exports.deleteLike = asyncHandler(async (req, res) => {
+  const io = req.app.get('SocketIO');
+  io.on('connection', (client) => {
+    client.on('forAllLikes', (postId) => {
+      if (postId === req.params.id) {
+        const allLikes = await Post.findById(req.params.id);
+        const numOfLikes = allLikes.likes.length - 1;
+        io.emit('NumberOfLikes', numOfLikes);
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
+      }
+    })
+  })
   const likes = await Post.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
