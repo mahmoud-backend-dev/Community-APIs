@@ -63,7 +63,7 @@ app.use(limiter)
 app.use(hpp());
 
 
-
+app.set('SocketIO', io)
 
 // Mount Api
 mountRoutes(app);
@@ -71,7 +71,7 @@ mountRoutes(app);
 app.use(errorHandler);
 app.use(notFoundErr);
 
-app.set('SocketIO',io)
+
 
 const start = async () => {
     try {
