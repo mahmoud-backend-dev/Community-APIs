@@ -19,8 +19,6 @@ exports.addCommentToPost = asyncHandler(async (req, res) => {
     client.on('forAddCommentToPost', (postId) => {
       if (postId === req.params.id) {
         io.emit('addComment',post)
-      } else {
-        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
       }
     })
   })
@@ -66,9 +64,6 @@ exports.updateComment = asyncHandler(async (req, res) => {
     client.on('forUpdateCommentFromPost', (data) => {
       if (data.postId === req.params.id && data.commentId === req.params.commentId) {
         io.emit('updateComment', comment)
-      } else {
-        return res.status(StatusCodes.BAD_REQUEST)
-          .json({ status: "Faild", msg: "Invaild Id for the post or the comment" });
       }
     })
   })
@@ -98,9 +93,6 @@ exports.deleteComment = asyncHandler(async (req, res) => {
     client.on('forDeleteCommentFromPost', (data) => {
       if (data.postId === req.params.id && data.commentId === req.params.commentId) {
         io.emit('deleteComment', comment._id)
-      } else {
-        return res.status(StatusCodes.BAD_REQUEST)
-          .json({ status: "Faild", msg: "Invaild Id for the post or the comment" });
       }
     })
   })
