@@ -8,9 +8,22 @@ const Comment = require('../models/Comment');
 // @route POST /api/v1/posts/:id/comments
 // @ptotect Protected/User
 exports.addCommentToPost = asyncHandler(async (req, res) => {
+  const io = req.app.get("SocketIO");
   req.body.user = req.user._id;
   req.body.post = req.params.id;
-  const post = await Comment.create(req.body)
+  const post = await (await Comment.create(req.body)).populate({
+    path: "user",
+    select: 'name'
+  });
+  io.on('connection',  (client) => { 
+    client.on('forAddCommentToPost', (postId) => {
+      if (postId === req.params.id) {
+        io.emit('addComment',post)
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
+      }
+    })
+  })
   res.status(StatusCodes.OK).json({ status: "Success", post });
 });
 
@@ -32,6 +45,7 @@ exports.getAllComment = asyncHandler(async (req, res) => {
 // @route PATCH /api/v1/posts/:id/comments/:commentId
 // @ptotect Protected/User
 exports.updateComment = asyncHandler(async (req, res) => {
+  const io = req.app.get("SocketIO");
   if (Object.keys(req.body).length === 0)
     return res.status(StatusCodes.NO_CONTENT).send();
   const comment = await Comment.findOneAndUpdate(
@@ -47,6 +61,17 @@ exports.updateComment = asyncHandler(async (req, res) => {
   );
   if (!comment)
     throw new BadRequest('You are not the owner of this comment ');
+  
+  io.on("connection", (client) => {
+    client.on('forUpdateCommentFromPost', (data) => {
+      if (data.postId === req.params.id && data.commentId === req.params.commentId) {
+        io.emit('updateComment', comment)
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST)
+          .json({ status: "Faild", msg: "Invaild Id for the post or the comment" });
+      }
+    })
+  })
   res.status(StatusCodes.OK).json({ status: "Success", comment });
 });
 
@@ -54,6 +79,7 @@ exports.updateComment = asyncHandler(async (req, res) => {
 // @route DELETE /api/v1/posts/:id/comments/:commentId
 // @ptotect Protected/User/Manager/Admin
 exports.deleteComment = asyncHandler(async (req, res) => {
+  const io = req.app.get("SocketIO");
   if (req.user.role === 'manager' || req.user.role === 'admin') {
     await Comment.findByIdAndRemove(req.params.commentId)
     return res.status(StatusCodes.NO_CONTENT).send();
@@ -67,5 +93,16 @@ exports.deleteComment = asyncHandler(async (req, res) => {
   );
   if (!comment)
     throw new BadRequest('You are not the owner of this comment')
+
+  io.on("connection", (client) => {
+    client.on('forDeleteCommentFromPost', (data) => {
+      if (data.postId === req.params.id && data.commentId === req.params.commentId) {
+        io.emit('deleteComment', comment)
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST)
+          .json({ status: "Faild", msg: "Invaild Id for the post or the comment" });
+      }
+    })
+  })
   res.status(StatusCodes.NO_CONTENT).send();
 })

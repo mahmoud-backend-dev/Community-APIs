@@ -131,13 +131,11 @@ exports.getAllLikes = asyncHandler(async (req, res) => {
 exports.addLike = asyncHandler(async (req, res) => {
   const io = req.app.get('SocketIO');
   io.on('connection', (client) => {
-    client.on('forAllLikes', (postId) => {
+    client.on('forAllLikes', async (postId) => {
       if (postId === req.params.id) {
         const allLikes = await Post.findById(req.params.id);
         const numOfLikes = allLikes.likes.length + 1;
         io.emit('NumberOfLikes', numOfLikes);
-      } else {
-        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
       }
     })
   })
@@ -156,13 +154,11 @@ exports.addLike = asyncHandler(async (req, res) => {
 exports.deleteLike = asyncHandler(async (req, res) => {
   const io = req.app.get('SocketIO');
   io.on('connection', (client) => {
-    client.on('forAllLikes', (postId) => {
+    client.on('forAllLikes', async (postId) => {
       if (postId === req.params.id) {
         const allLikes = await Post.findById(req.params.id);
         const numOfLikes = allLikes.likes.length - 1;
         io.emit('NumberOfLikes', numOfLikes);
-      } else {
-        return res.status(StatusCodes.BAD_REQUEST).json({ status: "Faild", msg: "Invaild Id for a post" });
       }
     })
   })
