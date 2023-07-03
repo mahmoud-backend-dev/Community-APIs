@@ -24,6 +24,7 @@ updates and notifications to all connected clients during interactive with post.
 - Express
 - Node.JS
 - Javascript
+- Multer
 
 ### To Install all the dependencies
 
