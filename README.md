@@ -24,7 +24,10 @@ updates and notifications to all connected clients during interactive with post.
 - Express
 - Node.JS
 - Javascript
+- jsonwebtoken for authentication and authorization
+- nodemailer
 - Multer
+- Socket.io
 
 ### To Install all the dependencies
 
