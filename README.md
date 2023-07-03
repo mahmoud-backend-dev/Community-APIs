@@ -38,7 +38,7 @@ npm start
 
 ## Routes
 
-### Users
+### Authentication
 ```
 POST   registration    /api/v1/user/signup
 POST   login   /api/v1/user/login
