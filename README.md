@@ -58,7 +58,7 @@ PATCH   update post   /api/v1/posts/643a1a9e9deef6782df77f4a
 GET  get all posts   /api/v1/posts?limit=5&page=1  (With pagination)
 GET  get specific post     /api/v1/posts/6446e3a8345aec8e18cfce80
 DELETE delete specific post   /api/v1/posts/643a2454be70c03128ba9a7c
-POST add like   /api/v1/posts/643a257b7cbaafadc7905031/likes (With use socket.io to emit event and listen event for real time app)
+POST add like   /api/v1/posts/643a257b7cbaafadc7905031/likes  (With use socket.io to emit event and listen event for real time app)
 GET get all likes   /api/v1/posts/643a257b7cbaafadc7905031/likes
 DELETE delete like    /api/v1/posts/643a257b7cbaafadc7905031/likes (With use socket.io to emit event and listen event for real time app)
 ```
