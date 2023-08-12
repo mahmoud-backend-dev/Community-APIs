@@ -11,6 +11,7 @@
 APIs are to be used in simple social media applications that contain communities among users 
 and allow users to add posts (text, images, or both) as well as interact with posts through 
 comments or likes in real-time.
+
 APIs for user authentication POST request to signup user, POST request to login user, 
 POST request to forget password, POST request to verify reset code from POST 
 request forget password and POST request to reset password.
