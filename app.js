@@ -1,28 +1,30 @@
-
-require('express-async-errors');
-require('dotenv').config();
-const path = require('path');
-const express = require('express');
+// Description: Main file of the application
+import { socketConnection } from './utils/io.js';
+import { createServer } from 'http';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __fileName = fileURLToPath(import.meta.url);
+const __dirname = dirname(__fileName);
+import 'express-async-errors';
+import 'dotenv/config.js';
+import express, { json, urlencoded, static as static_ } from 'express';
 const app = express();
 const port = process.env.PORT || 1812;
-const httpServer = require('http').createServer(app);
-const io = require('socket.io')(httpServer);
+const httpServer = createServer(app);
+const io = await socketConnection(httpServer)
+import mountRoutes from './routes/index.js';
+
+
 // Setting Security For App
-const cors = require('cors');
-const compression = require('compression');
-const rateLimit = require('express-rate-limit')
-const hpp = require('hpp');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean')
+import cors from 'cors';
+import compression from 'compression';
+import hpp from 'hpp';
+import mongoSanitize from 'express-mongo-sanitize';
 
-const swaggerUI = require('swagger-ui-express');
-const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./swagger.yaml');
 
-const errorHandler = require('./middleware/error-handler');
-const notFoundErr = require('./middleware/notFoundMiddleware');
-const connectDB = require('./db/connectDB');
-const mountRoutes = require('./routes');
+import errorHandler from './middleware/error-handler.js';
+import notFoundErr from './middleware/notFoundMiddleware.js';
+import connectDB from './db/connectDB.js';
 
 
 // Enable other domains to access your application
@@ -32,46 +34,34 @@ app.options('*', cors());
 // Compress all responses
 app.use(compression());
 
-// for Swagger Ui StartUp an running live server
-app.get('/', (req, res) => res.redirect('/api-docs'));
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'uploads')));
+
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(static_(path.join(__dirname, 'uploads')));
 
 // To remove data using these defaults, To apply data sanitization
 // nosql mongo injection
 app.use(mongoSanitize());
-// To sanitize user input coming from POST body, GET queries, and url params  ex: '<script></script>' to convert string ''&lt;script>&lt;/script>''
-app.use(xss())
 
 
-// Limit each IP to 100 requests per `window` (here, per 15 minutes)
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 100, 
-    message:
-    'Too many accounts created from this IP, please try again after an 15 minutes'
-})
-
-// Apply the rate limiting middleware to all requests
-app.use(limiter)
-
+// Set 'trust proxy' to a more secure mode
+app.set('trust proxy', 'loopback');
 
 // Express middleware to protect against HTTP Parameter Pollution attacks
-app.use(hpp());
+app.use(hpp())
+
+// Static Folder
+app.use(express.static('uploads'));
 
 
-app.set('SocketIO', io)
+app.set('IO', io);
 
-// Mount Api
+// Mounts Routes
 mountRoutes(app);
 
 app.use(errorHandler);
 app.use(notFoundErr);
-
-
 
 const start = async () => {
     try {

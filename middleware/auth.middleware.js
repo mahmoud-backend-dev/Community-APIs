@@ -1,7 +1,8 @@
-const asyncHandler = require('express-async-handler');
-const jwt = require('jsonwebtoken');
-const { UnauthenticatedError } = require('../errors');
-const User = require('../models/User');
+import asyncHandler from 'express-async-handler';
+import pkg from 'jsonwebtoken';
+const { verify } = pkg;
+import  UnauthenticatedError  from '../errors/unauthenticated.js';
+import User from '../models/User.js';
 
 
 const protectRoutes = asyncHandler(async (req, res, next) => {
@@ -11,11 +12,11 @@ const protectRoutes = asyncHandler(async (req, res, next) => {
         throw new UnauthenticatedError('No Bearer Token Provided')
     token = req.headers.authorization.split(" ")[1];
     // 2) Verify token (no change happens , expire data)
-    const decoded = jwt.verify(token, process.env.SECERT_JWT);
+    const decoded = verify(token, process.env.JWT_SECRET);
     
     // 3 ) Check user if exists or not by given token
-    const user = await User.findById(decoded.userId);
-    if (!user )
+    const user = await User.findById(decoded.userId)
+    if (!user)
         throw new UnauthenticatedError('The user that belong to this token does no longer exist')
     
     // 4 )  Check if user Change his Password after token created
@@ -31,4 +32,4 @@ const protectRoutes = asyncHandler(async (req, res, next) => {
     next()
 });
 
-module.exports = protectRoutes;
+export default protectRoutes;

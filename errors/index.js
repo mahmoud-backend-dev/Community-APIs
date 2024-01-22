@@ -1,11 +1,7 @@
-const BadRequest = require('./badRequest');
-const CustomErrorAPI = require('./customErrorAPI');
-const NotFoundError = require('./notFound');
-const UnauthenticatedError = require('./unauthenticated');
-
-module.exports = {
-    BadRequest,
-    CustomErrorAPI,
-    NotFoundError,
-    UnauthenticatedError,
-}
+export const ErrorCode = {
+    InvalidCredentials: "INVALID_CREDENTIALS",
+    EmailNotVerified: "EMAIL_NOT_VERIFIED",
+    EmailAlreadyExists: "EMAIL_ALREADY_EXISTS",
+    BanForever: "BAN_FOREVER",
+    BanTemporary: "BAN_TEMPORARY",
+};
